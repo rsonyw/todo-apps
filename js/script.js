@@ -1,41 +1,44 @@
-const todos = [];
-const RENDER_EVENT = 'render-todo';
+const bukus = [];
+const RENDER_EVENT = 'render-read';
 
 
 function generateId() {
     return +new Date();
 }
 
-function generateTodoObject(id, task, timestamp, isCompleted) {
+function generateReadObject(id, title, author, year, isCompleted) {
     return {
         id,
-        task,
-        timestamp,
+        title,
+        author,
+        year,
         isCompleted
     }
 }
 
 document.addEventListener(RENDER_EVENT, function () {
-    const uncompletedTODOList = document.getElementById('todos');
-    uncompletedTODOList.innerHTML = '';
+    const uncompletedReadList = document.getElementById('bukus');
+    uncompletedReadList.innerHTML = '';
 
-    const completedTODOList = document.getElementById('completed-todos');
-    completedTODOList.innerHTML = '';
+    const completedReadList = document.getElementById('completed-bukus');
+    completedReadList.innerHTML = '';
 
-    for (const todoItem of todos) {
-        const todoElement = makeTodo(todoItem);
-        if (!todoItem.isCompleted)
-            uncompletedTODOList.append(todoElement);
+    for (const buku of bukus) {
+        const readElement = makeRead(buku);
+        if (!buku.isCompleted)
+            uncompletedReadList.append(readElement);
         else
-            completedTODOList.append(todoElement);
+            completedReadList.append(readElement);
     }
 });
+
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const submitForm = document.getElementById('form');
     submitForm.addEventListener('submit', function (event) {
         event.preventDefault();
-        addTodo();
+        addRead();
     });
 
     if (isStorageExist()) {
@@ -43,36 +46,38 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-function makeTodo(todoObject) {
+function makeRead(readObject) {
     const textTitle = document.createElement('h2');
-    textTitle.innerText = todoObject.task;
+    textTitle.innerText = readObject.title;
 
-    const textTimestamp = document.createElement('p');
-    textTimestamp.innerText = todoObject.timestamp;
+    const textAuthor = document.createElement('h3');
+    textAuthor.innerText = readObject.author;
+
+    const textYear = document.createElement('p');
+    textYear.innerText = readObject.year;
 
     const textContainer = document.createElement('div');
     textContainer.classList.add('inner');
-    textContainer.append(textTitle, textTimestamp);
+    textContainer.append(textTitle, textAuthor, textYear);
 
     const container = document.createElement('div');
     container.classList.add('item', 'shadow');
     container.append(textContainer);
-    container.setAttribute('id', `todo-${todoObject.id}`);
+    container.setAttribute('id', `read-${readObject.id}`);
 
-    //undo button
-    if (todoObject.isCompleted) {
+    if (readObject.isCompleted) {
         const undoButton = document.createElement('button');
         undoButton.classList.add('undo-button');
 
         undoButton.addEventListener('click', function () {
-            undoTaskFromCompleted(todoObject.id);
+            undoTaskFromCompleted(readObject.id);
         });
 
         const trashButton = document.createElement('button');
         trashButton.classList.add('trash-button');
 
         trashButton.addEventListener('click', function () {
-            removeTaskFromCompleted(todoObject.id);
+            removeTaskFromCompleted(readObject.id);
         });
 
         container.append(undoButton, trashButton);
@@ -81,7 +86,7 @@ function makeTodo(todoObject) {
         checkButton.classList.add('check-button');
 
         checkButton.addEventListener('click', function () {
-            addTaskToCompleted(todoObject.id);
+            addTaskToCompleted(readObject.id);
         });
 
         container.append(checkButton);
@@ -90,65 +95,69 @@ function makeTodo(todoObject) {
     return container;
 }
 
-function addTodo() {
-    const textTodo = document.getElementById('title').value;
-    const timestamp = document.getElementById('date').value;
+function addRead() {
+    const textTitle = document.getElementById('title').value;
+    const textAuthor = document.getElementById('author').value;
+    const textYear = document.getElementById('year').value;
 
     const generatedID = generateId();
-    const todoObject = generateTodoObject(generatedID, textTodo, timestamp, false);
-    todos.push(todoObject);
+    const readObject = generateReadObject(generatedID, textTitle, textAuthor, textYear, false);
+    bukus.push(readObject);
 
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
-    alert('Tugas Baru Telah Ditambahkan!');
+    alert('Hore!Buku Baru Telah Ditambahkan ke dalam list!');
 }
 
-function addTaskToCompleted(todoId) {
-    const todoTarget = findTodo(todoId);
+function addTaskToCompleted(readId) {
+    const readTarget = findRead(readId);
 
-    if (todoTarget == null) return;
+    if (readTarget == null) return;
 
-    todoTarget.isCompleted = true;
+    readTarget.isCompleted = true;
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
-    alert('Tugas Telah Selesai Dilakukan!');
+    alert('Yeay! Buku Telah Selesai Dibaca!');
 }
 
-function findTodo(todoId) {
-    for (const todoItem of todos) {
-        if (todoItem.id === todoId) {
-            return todoItem;
+function findRead(readId) {
+    for (const buku of bukus) {
+        if (buku.id === readId) {
+            return buku;
         }
     }
     return null;
 }
 
-function removeTaskFromCompleted(todoId) {
-    const todoTarget = findTodoIndex(todoId);
+function removeTaskFromCompleted(readId) {
+    const readTarget = findReadIndex(readId);
 
-    if (todoTarget === -1) return;
+    if (readTarget === -1) return;
 
-    todos.splice(todoTarget, 1);
+    const confirmation = confirm('Kamu yakin akan menghapus data buku ini?');
+    if (!confirmation) return;
+
+    bukus.splice(readTarget, 1);
 
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
-    alert('Data Berhasil Dihapus!');
+    alert('Data Buku Berhasil Dihapus!');
 }
 
-function undoTaskFromCompleted(todoId) {
-    const todoTarget = findTodo(todoId);
+function undoTaskFromCompleted(readId) {
+    const readTarget = findRead(readId);
 
-    if (todoTarget == null) return;
+    if (readTarget == null) return;
 
-    todoTarget.isCompleted = false;
+    readTarget.isCompleted = false;
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
-    alert('Data Berhasil Dipulihkan!');
+    alert('Hore! Data Berhasil Dikembalikan!');
 }
 
-function findTodoIndex(todoId) {
-    for (const index in todos) {
-        if (todos[index].id === todoId) {
+function findReadIndex(readId) {
+    for (const index in bukus) {
+        if (bukus[index].id === readId) {
             return index;
         }
     }
@@ -157,18 +166,18 @@ function findTodoIndex(todoId) {
 
 function saveData() {
     if (isStorageExist()) {
-        const parsed = JSON.stringify(todos);
+        const parsed = JSON.stringify(bukus);
         localStorage.setItem(STORAGE_KEY, parsed);
         document.dispatchEvent(new Event(SAVED_EVENT));
     }
 }
 
-const SAVED_EVENT = 'saved-todo';
-const STORAGE_KEY = 'TODO_APPS';
+const SAVED_EVENT = 'saved-read';
+const STORAGE_KEY = 'READ_APPS';
 
 function isStorageExist() {
     if (typeof (Storage) === undefined) {
-        alert('Browser kamu tidak mendukung Web Storage');
+        alert('Yahh, browsernya ga support Web Storage :(');
         return false;
     }
     return true;
@@ -184,10 +193,12 @@ function loadDataFromStorage() {
     let data = JSON.parse(serializedData);
 
     if (data !== null) {
-        for (const todo of data) {
-            todos.push(todo);
+        for (const read of data) {
+            bukus.push(read);
         }
     }
 
     document.dispatchEvent(new Event(RENDER_EVENT));
+
+
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Sederhana</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="outerContainer">
+    <header>
+      <h1>Reading List</h1>
+      <p>Sebuah aplikasi sederhana untuk mencatat buku apa yang akan dan sudah kamu baca :)</p>
+
+    </header>
+    <div class="outerWrapper">
+      <div class="wrapper">
+        <div class="container bg-white shadow" id="add-read">
+          <h1 class="container-header text-center">Tambah buku</h1>
+          <form class="formbuku" action="#" id="form">
+            <div class="form-group form-title">
+              <label for="title">Masukkan judul buku</label>
+              <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group form-title">
+              <label for="author">Masukkan Penulis</label>
+              <input type="text" id="author" name="author" required>
+            </div>
+            <div class="form-group form-title">
+              <label for="year">Tahun Terbit</label>
+              <input type="number" id="year" name="year" required>
+            </div>
+            <input type="submit" value="Submit" name="Submit" class="btn-submit">
+          </form>
+        </div>
+      </div>
+
+      <div class="containerItem">
+        <h1 class="container-header">List Buku yang Akan Dibaca</h1>
+        <div class="list-item" id="bukus">
+        </div>
+      </div>
+
+      <div class="containerItem">
+        <h1 class="container-header">List Buku yang Sudah Dibaca</h1>
+        <div class="list-item" id="completed-bukus">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+  <script src="js/script.js" type="text/javascript"></script>
+</body>
+
+</html>
