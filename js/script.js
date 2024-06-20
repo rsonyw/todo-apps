@@ -6,13 +6,13 @@ function generateId() {
     return +new Date();
 }
 
-function generateReadObject(id, title, author, year, isCompleted) {
+function generateReadObject(id, title, author, year, isComplete) {
     return {
         id,
         title,
         author,
         year,
-        isCompleted
+        isComplete
     }
 }
 
@@ -25,7 +25,7 @@ document.addEventListener(RENDER_EVENT, function () {
 
     for (const buku of bukus) {
         const readElement = makeRead(buku);
-        if (!buku.isCompleted)
+        if (!buku.isComplete)
             uncompletedReadList.append(readElement);
         else
             completedReadList.append(readElement);
@@ -53,19 +53,21 @@ function makeRead(readObject) {
     const textAuthor = document.createElement('h3');
     textAuthor.innerText = readObject.author;
 
-    const textYear = document.createElement('p');
-    textYear.innerText = readObject.year;
+    const year = document.createElement('p');
+    year.innerText = readObject.year;
 
     const textContainer = document.createElement('div');
     textContainer.classList.add('inner');
-    textContainer.append(textTitle, textAuthor, textYear);
+    textContainer.append(textTitle, textAuthor, year);
+
 
     const container = document.createElement('div');
     container.classList.add('item', 'shadow');
+
     container.append(textContainer);
     container.setAttribute('id', `read-${readObject.id}`);
 
-    if (readObject.isCompleted) {
+    if (readObject.isComplete) {
         const undoButton = document.createElement('button');
         undoButton.classList.add('undo-button');
 
@@ -89,7 +91,14 @@ function makeRead(readObject) {
             addTaskToCompleted(readObject.id);
         });
 
-        container.append(checkButton);
+        const trashButton = document.createElement('button');
+        trashButton.classList.add('trash-button');
+
+        trashButton.addEventListener('click', function () {
+            removeTaskFromCompleted(readObject.id);
+        });
+
+        container.append(checkButton, trashButton);
     }
 
     return container;
@@ -98,10 +107,15 @@ function makeRead(readObject) {
 function addRead() {
     const textTitle = document.getElementById('title').value;
     const textAuthor = document.getElementById('author').value;
-    const textYear = document.getElementById('year').value;
+    const year = document.getElementById('year').value;
+
+    if (isNaN(year) || year.trim() === '') {
+        alert('Input tambahan harus berupa angka.');
+        return;
+    }
 
     const generatedID = generateId();
-    const readObject = generateReadObject(generatedID, textTitle, textAuthor, textYear, false);
+    const readObject = generateReadObject(generatedID, textTitle, textAuthor, Number(year), false);
     bukus.push(readObject);
 
     document.dispatchEvent(new Event(RENDER_EVENT));
@@ -114,7 +128,7 @@ function addTaskToCompleted(readId) {
 
     if (readTarget == null) return;
 
-    readTarget.isCompleted = true;
+    readTarget.isComplete = true;
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
     alert('Yeay! Buku Telah Selesai Dibaca!');
@@ -149,7 +163,7 @@ function undoTaskFromCompleted(readId) {
 
     if (readTarget == null) return;
 
-    readTarget.isCompleted = false;
+    readTarget.isComplete = false;
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
     alert('Hore! Data Berhasil Dikembalikan!');
@@ -194,11 +208,11 @@ function loadDataFromStorage() {
 
     if (data !== null) {
         for (const read of data) {
+            read.year = Number(year);
             bukus.push(read);
         }
     }
 
     document.dispatchEvent(new Event(RENDER_EVENT));
-
 
 }
